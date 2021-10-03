@@ -1,3 +1,6 @@
+<script type="text/javascript" 
+src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
+</script>
 ### Euler Phi
 
 오일러 피 함수 : $ \phi (a)  = a까지 a와 서로소가 되는 수의 개수 $
