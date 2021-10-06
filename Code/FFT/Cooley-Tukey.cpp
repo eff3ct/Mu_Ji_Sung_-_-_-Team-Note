@@ -60,3 +60,38 @@ void product(vector<cpx>& A, vector<cpx>& B) {
         C[i] = cpx(round(C[i].real()), round(C[i].imag()));
     }
 }
+
+/*
+//Cooley-Tukey FFT
+void FFT(vector<cpx>& A, bool invert) {
+    int n = (int)A.size();
+    for(int i = 1, j = 0; i < n; ++i) {
+        int bit = n >> 1;
+        for(; j >= bit; bit >>= 1) j -= bit;
+        j += bit;
+        if(i < j) swap(A[i], A[j]);
+    }    
+
+    for(int length = 2; length <= n; length <<= 1) {
+        double ang = 2 * PI / length * (invert ? -1 : 1);
+        cpx w(cos(ang), sin(ang));
+
+        for(int i = 0; i < n; i += length) {
+            cpx w_i(1, 0);
+            for(int j = 0; j < length / 2; ++j) {
+                cpx u = A[i + j], v = A[i + j + length / 2] * w_i;
+                A[i + j] = u + v;
+                A[i + j + length / 2] = u - v;
+                w_i *= w;
+            }
+        }
+    }
+    
+    if(invert) {
+        for(int i = 0; i < n; ++i) {
+            A[i] /= cpx(n, 0);
+            A[i] = cpx(round(A[i].real()), round(A[i].imag()));
+        }
+    }
+}
+*/ //faster version of FFT (https://blog.myungwoo.kr/54)
