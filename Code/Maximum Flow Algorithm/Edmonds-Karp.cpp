@@ -13,7 +13,7 @@ using namespace std;
 int capacity[V_MAX][V_MAX] = { 0,};
 int flow[V_MAX][V_MAX] = { 0,};
 
-//ford-fulkerson
+//edmonds-fulkerson
 int edmonds_karp (int source, int sink, int numOfVertex) {
     int result = 0;
 
