@@ -23,7 +23,7 @@ void bellman_ford(vector<vector<pair<int, int>>> adj, int start) {
 
     //check negative cycle
     for(int i = 1; i <= N; ++i) {
-        for(auto edge : adj[i]) {
+        for(auto& edge : adj[i]) {
             if(dist[edge.first] > dist[i] + edge.second) { //if dist changes, it means that it has negative cycle
                 //cout << "YES\n";
                 return;
