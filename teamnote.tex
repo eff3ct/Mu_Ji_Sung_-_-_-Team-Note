@@ -492,4 +492,164 @@ $$\large \phi(a^{m})=a^{m}-a^{m-1}=a^{m}(1-\frac{1}{a})$$(a가 소수일 경우)
 
 $$\large \phi(x)=x(1-\frac{1}{p_{1}})(1-\frac{1}{p_{2}})(1-\frac{1}{p_{3}})...$$ ($$x = p_{1} ^ {k} p_{2} ^ {k'}...$$  , 즉 일반적인 경우)
 
+\section{SCC}
+\begin{minted}{cpp}
+#include <iostream>
+#include <vector>
+#include <stack>
+#include <algorithm>
+
+using namespace std;
+
+vector<int> ID; int id;
+vector<bool> isSCC;
+vector<vector<int>> SCC;
+stack<int> stackSCC;
+
+int DFS(vector<vector<int>>& adj, int node) {
+    ID[node] = ++id;
+    stackSCC.push(node);
+
+    int parent = ID[node];
+
+    for(auto& element : adj[node]) {
+        int nextNode = element;
+        if(ID[nextNode] == 0) parent = min(parent, DFS(adj, nextNode));
+        else if(!isSCC[nextNode]) parent = min(parent, ID[nextNode]);
+    }
+
+    if(parent == ID[node]) {
+        vector<int> elementSCC;
+        while(true) {
+            int topNode = stackSCC.top();
+            stackSCC.pop();
+
+            elementSCC.push_back(topNode);
+            isSCC[topNode] = true;
+
+            if(topNode == node) break;
+        }
+        SCC.push_back(elementSCC);
+    }
+
+    return parent;
+}
+
+void solve(vector<vector<int>>& adj, int& V) {
+    for(int i = 1; i <= V; ++i) {
+        if(ID[i] == 0) DFS(adj, i);
+    }
+
+    cout << SCC.size() << '\n';
+    
+    for(auto& element : SCC) sort(element.begin(), element.end());
+    sort(SCC.begin(), SCC.end());
+
+    for(auto& element : SCC) {
+        for(auto& x : element) cout << x << " ";
+        cout << "-1\n";
+    }
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    int V, E; cin >> V >> E;
+
+    isSCC.resize(V + 1, false);
+    ID.resize(V + 1, 0);
+    vector<vector<int>> adj(V + 1);
+    for(int i = 0; i < E; ++i) {
+        int a, b; cin >> a >> b;
+        adj[a].push_back(b);
+    }
+
+    solve(adj, V);
+
+    return 0;
+}
+\end{minted}
+
+\section{Plane-Sweeping}
+\begin{minted}{cpp}
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <tuple>
+
+using namespace std;
+
+class segTree {
+    private:
+        vector<int> sum;
+        vector<int> cnt;
+
+    public:
+        segTree(int N) {
+            sum.resize(N * 4);
+            cnt.resize(N * 4);
+        }
+
+        void updateRange(int start, int end, int node, int left, int right, int diff) {
+            if(start > right || end < left) return;
+
+            if(left <= start && end <= right) cnt[node] += diff;
+            else {
+                int mid = (start + end) / 2;
+                updateRange(start, mid, node * 2, left, right, diff);
+                updateRange(mid + 1, end, node * 2 + 1, left, right, diff);
+            }
+
+            if(cnt[node]) sum[node] = end - start + 1;
+            else if(start != end) sum[node] = sum[node * 2] + sum[node * 2 + 1];
+            else sum[node] = 0;
+        }
+
+        int getHeight() {
+            return sum[1];
+        }
+};
+
+int main() {
+    int N; cin >> N;
+
+    segTree Tree(30000);
+
+    vector<tuple<int, int, int, int>> line;
+    for(int i = 0; i < N; ++i) {
+        int x1, y1, x2, y2; cin >> x1 >> y1 >> x2 >> y2;
+        line.push_back({x1, y1, y2, 1});
+        line.push_back({x2, y1, y2, -1});
+        /*          (x2, y2)
+          (x1, y1)          */
+        //x1 , y1 ~ y2 , start = 1
+        //x2 , y1 ~ y2 , end = -1
+        //sort by x
+        //(x, y1, y2, isStart)
+    }
+
+    sort(line.begin(), line.end());
+    int ret = 0;
+    int prev = get<0>(line[0]);
+    for(auto& element : line) {
+        int x = get<0>(element);
+        int y1 = get<1>(element);
+        int y2 = get<2>(element);
+        int diff = get<3>(element);
+
+        int deltaX = x - prev;
+        ret += Tree.getHeight() * deltaX;
+        prev = x;
+
+        Tree.updateRange(0, 30000, 1, y1, y2 - 1, diff);
+    }
+
+    cout << ret;
+
+    return 0;
+}
+\end{minted}
+
 \end{document}
